@@ -11,8 +11,13 @@ export class AuthService {
         private jwtService: JwtService
     ){}
 
-    async validateUser(username: string, password: String): Promise<any>{
-            const user = await this.usersService.getByEmail(username);
+    async validateUser(username: any, password: String): Promise<any>{
+            let user;
+            if(isNaN(username)){
+                user = await this.usersService.getByEmail(username);
+            } else {
+                user = await this.usersService.getByCpfCnpj(Number.parseInt(username));
+            }
             if(!user){
                return null;
             }

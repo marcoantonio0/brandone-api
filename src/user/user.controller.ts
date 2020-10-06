@@ -24,10 +24,14 @@ export class UserController {
         return this.sUser.getById(id);
     }
 
-    @SetMetadata('roles', ['admin'])
-    @UseGuards(JwtAuthGuard, RolesGuard)
+
+    @Get('cpfcnpj/:id')
+    async getByCpfCnpj(@Param('id') cpfCnpj: number) : Promise<UserModule>{
+        return this.sUser.getByCpfCnpj(cpfCnpj);
+    }
+
     @Get('email/:id')
-    async getByEmail(@Param('email') email: string) : Promise<UserModule>{
+    async getByEmail(@Param('id') email: string) : Promise<UserModule>{
         return this.sUser.getByEmail(email);
     }
 

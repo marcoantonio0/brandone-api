@@ -8,7 +8,7 @@ export const UserSchema = new mongoose.Schema({
         maxlength: 320,
         required: true
     },
-    username: {
+    email: {
         type: String,
         unique: true,
         trim: true,
@@ -34,5 +34,10 @@ export const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['admin', 'user', 'customer'],
         required: true
-    }]
+    }],
+    phone: {
+        type: Number,
+        required: true,
+        trim: true
+    }
 })
