@@ -35,6 +35,10 @@ export const UserSchema = new mongoose.Schema({
         enum: ['admin', 'user', 'customer'],
         required: true
     }],
+    company: {
+        type: String,
+        maxlength: 128
+    },
     phone: {
         type: Number,
         required: true,

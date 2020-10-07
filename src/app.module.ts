@@ -1,3 +1,4 @@
+import { OrderModule } from './order/order.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -18,6 +19,7 @@ import { RolesGuard } from './auth/shared/roles.guard';
       useNewUrlParser: true
     }),
     UserModule,
+    OrderModule,
     AuthModule
   ],
   controllers: [AppController],
