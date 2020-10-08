@@ -1,12 +1,13 @@
+import { CategoryModel } from './category';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class CategoryService {
-    constructor(@InjectModel('Category') private readonly categoryModel: Model<any>){}
+    constructor(@InjectModel('Category') private readonly categoryModel: Model<CategoryModel>){}
 
-    async create(data) {
+    async create(data: CategoryModel) {
         try {
             const category = await new this.categoryModel(data);
             await category.save();
