@@ -43,5 +43,9 @@ export const UserSchema = new mongoose.Schema({
         type: Number,
         required: true,
         trim: true
+    },
+    create_at: {
+        type: Date,
+        default: Date.now
     }
-})
+}, { timestamps: true })

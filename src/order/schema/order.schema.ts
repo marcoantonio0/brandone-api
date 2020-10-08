@@ -19,13 +19,19 @@ export const OrderSchema = new mongoose.Schema({
     images: [{
         type: String
     }],
-    category: [],
-    status: [],
+    category: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Category',
+        required: true
+    }],
+    status: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Status',
+        required: true
+    }],
     create_at: {
         type: Date,
         default: Date.now,
         required: true
     }
-}, {
-    timestamps: true
-})
+}, { timestamps: true })
