@@ -32,7 +32,7 @@ export class UserService {
                 password: hashPassword,
                 roles: ['customer']
             });
-            return await createUser.save(user);
+            return await createUser.save();
         } catch(error) {
             if(error.code === 11000 && error.keyPattern.username == 1){
                 throw new HttpException('Este e-mail já está cadastrado!', HttpStatus.BAD_REQUEST);
