@@ -1,0 +1,17 @@
+
+
+== Order Status User ==
+1 - Em andamento
+2 - Em analise
+3 - Aguardando alterações
+4 - Finalizado
+5 - Cancelado
+
+== Order Status ==
+1 - Aguardando orçamento
+2 - Aguardanto pagamento
+3 - Pagamento em analise
+4 - Projeto em execução
+5 - Projeto em análise
+6 - Concluído
+7 - Cancelado
