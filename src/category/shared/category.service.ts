@@ -17,4 +17,8 @@ export class CategoryService {
         }
     }
 
+    async getAll() {
+        return this.categoryModel.find().exec();
+    }
+
 }

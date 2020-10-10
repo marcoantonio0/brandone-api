@@ -24,17 +24,50 @@ export class UserService {
         return await this.userModel.findOne({ cpfcnpj }).exec();
     }
 
+    async getMenu(_id: string){
+        const user = await  this.userModel.findOne({ _id }).populate('menu').exec();
+        let subExits = [];
+        for (const [index, menu] of user.menu.entries()) {
+            // Verifica se o menu está inativo e o remove
+            if(!menu.is_active){
+                user.menu.splice(index, 1);
+            } 
+            // Verificar se o usuario possui ou não permissão nos submenus
+            for (const submenu of menu.submenu) {
+                let hasSub = user.submenu.findIndex(x => x == submenu._id);
+                let findSub = menu.submenu.findIndex(x => x._id == user.submenu[hasSub]);
+                if(findSub > -1){
+                    if(!menu.submenu[findSub].is_active) continue;
+                    else subExits.push(menu.submenu[findSub]);
+                }
+            }
+            /* 
+                Subscreve o submenu com apenas os permitidos
+                e remove caso não houver nenhum
+             */
+            if(subExits.length > 0){
+                menu.submenu = subExits;
+                subExits = [];
+            } else {
+                menu.submenu = [];
+            }
+        }
+        return user.menu; // Retorna o menu
+    }
+
     async create(user) {
         const hashPassword = await bcrypt.hash(user.password, 10);
         try {
             const createUser = new this.userModel({
                 ...user,
-                password: hashPassword,
+                password: hashPassword, // Troca a senha enviada para o crypt.hash
                 roles: ['customer']
             });
-            return await createUser.save();
+            await createUser.save(); // Salvar o usuario no banco
+            return new HttpException('Cadastro com sucesso!', HttpStatus.CREATED);
         } catch(error) {
-            if(error.code === 11000 && error.keyPattern.username == 1){
+            console.log(error);
+            if(error.code === 11000 && error.keyPattern.email == 1){
                 throw new HttpException('Este e-mail já está cadastrado!', HttpStatus.BAD_REQUEST);
             }
             if(error.code === 11000 && error.keyPattern.cpfcnpj == 1){
@@ -46,7 +79,7 @@ export class UserService {
     }
 
 
-    async update(id: string, user: UserModel){
+    async update(id: string, user: any){
         try {
             await this.userModel.updateOne({ _id: id }, user).exec();
             return this.getById(id);

@@ -4,6 +4,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put, SetMetadata, UseGuards
 import { UserModule } from './user.module';
 import { UserModel } from './shared/user';
 import { RolesGuard } from 'src/auth/shared/roles.guard';
+import { MenuModel } from 'src/menu/shared/menu';
+import { MenuModule } from 'src/menu/menu.module';
 
 @Controller('user')
 export class UserController {
@@ -36,7 +38,7 @@ export class UserController {
     }
 
     @Post()
-    async create(@Body() user: UserModel) : Promise<UserModel>{
+    async create(@Body() user: UserModel) : Promise<any>{
         return this.sUser.create(user);
     }
 
@@ -57,4 +59,10 @@ export class UserController {
     async delete(@Param('id') id: string){
         return this.sUser.delete(id);
     }
+
+    @Get('menu/:id')
+    getMenu(@Param('id') _id: string): Promise<MenuModule[]>{
+        return this.sUser.getMenu(_id);
+    }
+
 }

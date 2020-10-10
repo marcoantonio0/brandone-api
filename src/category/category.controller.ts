@@ -1,6 +1,6 @@
 import { JwtAuthGuard } from './../auth/shared/jwt-auth.guard';
 import { CategoryService } from './shared/category.service';
-import { Body, Controller, HttpException, HttpStatus, Post, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, SetMetadata, UseGuards } from '@nestjs/common';
 import { RolesGuard } from 'src/auth/shared/roles.guard';
 import { CategoryModel } from './shared/category';
 
@@ -15,5 +15,10 @@ export class CategoryController {
     @Post()
     async create(@Body() data: CategoryModel) : Promise<any> {
         return this.sCategory.create(data);
+    }
+
+    @Get()
+    async getAll() : Promise<any> {
+        return this.sCategory.getAll();
     }
 }

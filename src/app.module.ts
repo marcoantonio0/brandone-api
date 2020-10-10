@@ -1,3 +1,4 @@
+import { MenuModule } from './menu/menu.module';
 import { OrderModule } from './order/order.module';
 import { CategoryModule } from './category/category.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -10,7 +11,8 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-        OrderModule, 
+        MenuModule, 
+    OrderModule, 
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),

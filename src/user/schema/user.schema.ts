@@ -5,7 +5,7 @@ export const UserSchema = new mongoose.Schema({
         type: Number,
         unique: true,
         trim: true,
-        maxlength: 320,
+        maxlength: 16,
         required: true
     },
     email: {
@@ -35,17 +35,20 @@ export const UserSchema = new mongoose.Schema({
         enum: ['admin', 'user', 'customer'],
         required: true
     }],
-    company: {
+    razao_social: {
         type: String,
-        maxlength: 128
+        maxlength: 128 
     },
     phone: {
         type: Number,
         required: true,
         trim: true
     },
-    create_at: {
-        type: Date,
-        default: Date.now
-    }
-}, { timestamps: true })
+    menu: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Menu'
+    }],
+    submenu: [{
+        type: String
+    }]
+}, { timestamps: true });

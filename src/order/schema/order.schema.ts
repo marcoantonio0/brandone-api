@@ -15,10 +15,6 @@ export const OrderSchema = new mongoose.Schema({
        maxlength: 600,
        required: true
    },
-   create_at: {
-       type: Date,
-       default: Date.now
-   },
    category: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
@@ -30,5 +26,10 @@ export const OrderSchema = new mongoose.Schema({
    },
    images: [{
        type: String
-   }]
+   }],
+   status: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'OrderStatus',
+    required: true   
+    }]
 }, { timestamps: true })
