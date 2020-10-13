@@ -3,18 +3,31 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from './user';
+import { query } from 'express';
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel('User') private readonly userModel: Model<UserModel>){}
 
-    async getAll(query){
+    async getAll(querys){
         const select = 'email name menu submenu cpfcnpj roles';
-        if(query.search){
-             return await this.userModel.find({ $text: { $search: query.search } }).populate('menu').select(select).exec();
+        let users;
+        let count;
+        let offset = querys.offset || 0;
+        if(Object.keys(querys).length != 0){
+            let query = {};
+            if(querys.search) query['$text'] = { $search: querys.search };  
+            if(querys.roles) query['roles'] =  { $in: querys.roles.split('-') };
+            count = await this.userModel.find(query).populate('menu').estimatedDocumentCount();
+            users = await this.userModel.find(query).populate('menu').select(select).skip(offset).limit(20).exec();
         } else {
-            return await this.userModel.find().populate('menu').select(select).exec();
+            count =  await this.userModel.find(query).populate('menu').estimatedDocumentCount();
+            users = await this.userModel.find().populate('menu').select(select).skip(offset).limit(20).exec();
         }
+        let usersAll = {};
+        usersAll['total'] = count;
+        usersAll['users'] = users;
+        return usersAll;
     }
 
     async getById(id: string){

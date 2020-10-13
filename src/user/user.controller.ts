@@ -17,7 +17,7 @@ export class UserController {
     @SetMetadata('roles', ['admin'])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
-    async getAll(@Query() query: string): Promise<UserModel[]>{
+    async getAll(@Query() query: string): Promise<any>{
         return this.sUser.getAll(query);
     }
 
@@ -61,6 +61,7 @@ export class UserController {
         return this.sUser.delete(id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('menu/:id')
     getMenu(@Param('id') _id: string): Promise<MenuModule[]>{
         return this.sUser.getMenu(_id);

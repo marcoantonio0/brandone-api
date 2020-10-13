@@ -53,4 +53,4 @@ export const UserSchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
-UserSchema.index({ name: "text", cpfcnpj: "text", email: "text" });
+UserSchema.index({ name: "text", cpfcnpj: "text", email: "text", roles: "text" });
