@@ -14,6 +14,9 @@ export const MenuSchema = new mongoose.Schema({
         default: true,
         required: true
     },
+    icon: {
+        type: String,
+    },
     submenu: [{
         description: {
             type:String,

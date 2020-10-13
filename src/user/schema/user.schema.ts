@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 export const UserSchema = new mongoose.Schema({
     cpfcnpj: {
-        type: Number,
+        type: String,
         unique: true,
         trim: true,
         maxlength: 16,
@@ -52,3 +52,5 @@ export const UserSchema = new mongoose.Schema({
         type: String
     }]
 }, { timestamps: true });
+
+UserSchema.index({ name: "text", cpfcnpj: "text", email: "text" });

@@ -1,5 +1,5 @@
 import { UserService } from 'src/user/shared/user.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MenuModel } from './menu';
@@ -31,20 +31,29 @@ export class MenuService {
 
     async addUserMenu(_id: string, data: any){
         try {
-            console.log(_id);
-            await this.sUser.update(_id, { $push: { menu: { $each: data.menu } } });
+            const user = await this.sUser.getById(_id);
+            if(user.menu.findIndex(x => x._id == data.menu) > -1){
+                await this.sUser.update(_id, { $pull: { menu: data.menu  } });
+            } else {
+                await this.sUser.update(_id, { $push: { menu:  data.menu } });
+            }
             return await this.sUser.getById(_id);
         } catch (error) {
-            console.log(error);
+            throw new HttpException('Houve um erro a executar sua requisição.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     async addUserSubmenu(_id: string, data: any){
         try {
-            await this.sUser.update(_id, { $push: { submenu: { $each: data.submenu } } });
+            const user = await this.sUser.getById(_id);
+            if(user.submenu.findIndex(x => x == data.submenu) > -1){
+                await this.sUser.update(_id, { $pull: { submenu: data.submenu  } });
+            } else {
+                await this.sUser.update(_id, { $push: { submenu:  data.submenu } });
+            }
             return await this.sUser.getById(_id);
         } catch (error) {
-            console.log(error);
+            throw new HttpException('Houve um erro a executar sua requisição.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

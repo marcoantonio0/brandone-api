@@ -1,6 +1,6 @@
 import { JwtAuthGuard } from './../auth/shared/jwt-auth.guard';
 import { UserService } from './shared/user.service';
-import { Body, Controller, Delete, Get, Param, Post, Put, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, SetMetadata, UseGuards } from '@nestjs/common';
 import { UserModule } from './user.module';
 import { UserModel } from './shared/user';
 import { RolesGuard } from 'src/auth/shared/roles.guard';
@@ -17,15 +17,16 @@ export class UserController {
     @SetMetadata('roles', ['admin'])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
-    async getAll(): Promise<UserModel[]>{
-        return this.sUser.getAll();
+    async getAll(@Query() query: string): Promise<UserModel[]>{
+        return this.sUser.getAll(query);
     }
 
+    @SetMetadata('roles', ['admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Get(':id')
     async getById(@Param('id') id: string) : Promise<UserModule>{
         return this.sUser.getById(id);
     }
-
 
     @Get('cpfcnpj/:id')
     async getByCpfCnpj(@Param('id') cpfCnpj: number) : Promise<UserModule>{

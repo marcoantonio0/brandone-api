@@ -8,12 +8,18 @@ import { UserModel } from './user';
 export class UserService {
     constructor(@InjectModel('User') private readonly userModel: Model<UserModel>){}
 
-    async getAll(){
-        return await this.userModel.find().exec();
+    async getAll(query){
+        const select = 'email name menu submenu cpfcnpj roles';
+        if(query.search){
+             return await this.userModel.find({ $text: { $search: query.search } }).populate('menu').select(select).exec();
+        } else {
+            return await this.userModel.find().populate('menu').select(select).exec();
+        }
     }
 
     async getById(id: string){
-        return await this.userModel.findById(id).exec();
+        const select = 'email name menu submenu cpfcnpj roles';
+        return await this.userModel.findById(id).populate('menu').select(select).exec();
     }
 
     async getByEmail(email: string){
