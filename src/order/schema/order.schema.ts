@@ -3,7 +3,8 @@ import * as mongoose from 'mongoose';
 export const OrderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'    
+        ref: 'User',
+        required: true    
     },
    title: {
        type: String,
@@ -33,3 +34,5 @@ export const OrderSchema = new mongoose.Schema({
     required: true   
     }]
 }, { timestamps: true })
+
+OrderSchema.index({ title: "text" });

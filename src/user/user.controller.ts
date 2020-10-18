@@ -43,7 +43,7 @@ export class UserController {
         return this.sUser.create(user);
     }
 
-    @SetMetadata('roles', ['custumer','user'])
+    @SetMetadata('roles', ['admin'])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Put(':id')
     async update(

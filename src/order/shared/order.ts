@@ -4,9 +4,10 @@ export interface OrderModel extends Document {
     user: string; 
    title: string;
    description: string;
-   create_at: Date;
+   createAt: Date;
+   updatedAt: Date;
    category: string[];
-   deadline: string;
+   deadline: Date;
    images: string[];
    status: string[];
 }

@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 
 export interface UserModel extends Document {
     submenu: string[];
-    username: string;
+    email: string;
     password: string;
     name: string;
     birthday: Date;

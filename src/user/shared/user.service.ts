@@ -4,24 +4,28 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from './user';
 import { query } from 'express';
+import { MailService } from 'src/mailer/mail.service';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel('User') private readonly userModel: Model<UserModel>){}
+    constructor(
+        @InjectModel('User') private readonly userModel: Model<UserModel>,
+        private sMail: MailService
+        ){}
 
     async getAll(querys){
         const select = 'email name menu submenu cpfcnpj roles';
         let users;
         let count;
-        let offset = querys.offset || 0;
+        let offset = parseInt(querys.offset) || 0;
         if(Object.keys(querys).length != 0){
             let query = {};
             if(querys.search) query['$text'] = { $search: querys.search };  
             if(querys.roles) query['roles'] =  { $in: querys.roles.split('-') };
-            count = await this.userModel.find(query).populate('menu').estimatedDocumentCount();
+            count = await this.userModel.find(query).populate('menu').countDocuments();
             users = await this.userModel.find(query).populate('menu').select(select).skip(offset).limit(20).exec();
         } else {
-            count =  await this.userModel.find(query).populate('menu').estimatedDocumentCount();
+            count =  await this.userModel.find().populate('menu').estimatedDocumentCount();
             users = await this.userModel.find().populate('menu').select(select).skip(offset).limit(20).exec();
         }
         let usersAll = {};
@@ -31,7 +35,7 @@ export class UserService {
     }
 
     async getById(id: string){
-        const select = 'email name menu submenu cpfcnpj roles';
+        const select = 'email name menu submenu cpfcnpj roles birthday createdAt updatedAt';
         return await this.userModel.findById(id).populate('menu').select(select).exec();
     }
 
@@ -83,9 +87,9 @@ export class UserService {
                 roles: ['customer']
             });
             await createUser.save(); // Salvar o usuario no banco
+            this.sMail.registerEmail(createUser.email, createUser.name);
             return new HttpException('Cadastro com sucesso!', HttpStatus.CREATED);
         } catch(error) {
-            console.log(error);
             if(error.code === 11000 && error.keyPattern.email == 1){
                 throw new HttpException('Este e-mail já está cadastrado!', HttpStatus.BAD_REQUEST);
             }

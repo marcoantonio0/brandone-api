@@ -5,4 +5,5 @@ export interface OrderStatusModel extends Document {
     statusid: Number;
     status: string;
     description: string;
+    user: string;
 }
