@@ -2,6 +2,7 @@ import { Document } from 'mongoose';
 
 export interface OrderModel extends Document {
     user: string; 
+    customer: string;
    title: string;
    description: string;
    createAt: Date;
@@ -10,4 +11,5 @@ export interface OrderModel extends Document {
    deadline: Date;
    images: string[];
    status: string[];
+   _id: string;
 }

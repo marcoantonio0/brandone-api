@@ -10,4 +10,4 @@ export const CategorySchema = new mongoose.Schema({
        type: String,
        maxlength: 48
    }
-}, { timestamps: true })
+})

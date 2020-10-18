@@ -25,7 +25,7 @@ export class OrderService {
             await order.save();
             return new HttpException('Briefing criado com sucesso!', HttpStatus.CREATED);
         } catch (error) {
-            return new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -49,7 +49,7 @@ export class OrderService {
             orderAll['orders'] = order;
             return orderAll;
         } catch (error) {
-            return new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,7 +61,7 @@ export class OrderService {
             }
             return new HttpException('Status criado com sucesso!', HttpStatus.CREATED);
         } catch (error) {
-            return new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -70,7 +70,7 @@ export class OrderService {
         try {
            return await this.orderModel.findOne({ _id }).populate(populate).exec();
         } catch (error) {
-            return new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

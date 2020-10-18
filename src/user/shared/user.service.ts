@@ -87,7 +87,7 @@ export class UserService {
                 roles: ['customer']
             });
             await createUser.save(); // Salvar o usuario no banco
-            this.sMail.registerEmail(createUser.email, createUser.name);
+            this.sMail.registerEmail(createUser.email, createUser.name); // Enviado e-mail de bem-vindo
             return new HttpException('Cadastro com sucesso!', HttpStatus.CREATED);
         } catch(error) {
             if(error.code === 11000 && error.keyPattern.email == 1){

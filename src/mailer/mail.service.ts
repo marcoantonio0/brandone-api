@@ -25,4 +25,24 @@ export class MailService {
         });
     }
 
+    public briefingEmail(to, name): void {
+      this
+        .mailerService
+        .sendMail({
+          to: to,
+          from: 'noreply@brandone.com.br',
+          subject: 'Projeto em andamento!',
+          template: 'briefing', 
+          context: {  
+            name: name,
+          },
+        })
+        .then((success) => {
+          console.log(`Email enviado para: ${success.envelope.to}`)
+        })
+        .catch((err) => {
+          console.log(err)
+        });
+    }
+
 }

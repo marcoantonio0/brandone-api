@@ -1,16 +1,31 @@
 import { OrderController } from './order.controller';
 import { OrderService } from './shared/order.service';
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { OrderSchema } from './schema/order.schema';
 import { UserModule } from 'src/user/user.module';
 import { OrderStatusSchema } from './schema/orderstatus.schema';
 import { MailModule } from 'src/mailer/mail.module';
+import { Connection } from 'mongoose';
+import * as AutoIncrementFactory from 'mongoose-sequence';
+import { ArchiveSchema } from './schema/archive.schema';
 
 @Module({
   imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: 'Order',
+        useFactory: async (connection: Connection) => {
+          const schema = OrderSchema;
+          const AutoIncrement = AutoIncrementFactory(connection);
+          schema.plugin(AutoIncrement, {inc_field: 'id'});
+          return schema;
+        },
+        inject: [getConnectionToken(process.env.CONNECTIONSTRING)],
+      },
+    ]),
     MongooseModule.forFeature(
-      [{ name: 'Order', schema: OrderSchema }, { name: 'OrderStatus', schema: OrderStatusSchema }],
+      [{ name: 'OrderStatus', schema: OrderStatusSchema }, { name: 'Archive', schema: ArchiveSchema }],
       ),
     UserModule,
     MailModule
