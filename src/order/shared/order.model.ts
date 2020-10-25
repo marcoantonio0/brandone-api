@@ -12,4 +12,6 @@ export interface OrderModel extends Document {
    images: string[];
    status: string[];
    _id: string;
+   time: string;
+   id: number;
 }

@@ -1,3 +1,4 @@
+import { TokenModule } from './token/token.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailModule } from './mailer/mail.module';
 import { MailService } from './mailer/mail.service';
@@ -10,13 +11,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { MailerModule } from '@nestjs-modules/mailer';  
+import { MailerModule } from '@nestjs-modules/mailer';
 import { AuthModule } from './auth/auth.module';
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 
 @Module({
   imports: [
-        MailModule, 
+    TokenModule,
+    MailModule,
     MailerModule.forRoot({
       transport: {
         host: process.env.MAILHOST,
@@ -28,7 +29,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
         },
       },
       defaults: {
-        from:'"nest-modules" <'+process.env.MAILUSER+'>',
+        from: '"nest-modules" <' + process.env.MAILUSER + '>',
       },
       template: {
         dir: process.cwd() + '/templates',
@@ -38,8 +39,8 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
         },
       },
     }),
-    MenuModule, 
-    OrderModule, 
+    MenuModule,
+    OrderModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
@@ -47,12 +48,12 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
       useCreateIndex: true,
       useNewUrlParser: true,
     }),
-    CategoryModule, 
+    CategoryModule,
     UserModule,
     AuthModule,
   ],
   controllers: [AppController],
   providers: [
-        MailService, AppService],
+    MailService, AppService],
 })
-export class AppModule {}
+export class AppModule { }

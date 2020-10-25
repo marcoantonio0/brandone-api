@@ -15,4 +15,6 @@ export interface UserModel extends Document {
         link: string;
         submenu: any[]
     }];
+    hour_price: string;
+    hour_worked: string;
 }

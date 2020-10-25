@@ -5,11 +5,13 @@ import * as bcrypt from 'bcrypt';
 import { UserModel } from './user';
 import { query } from 'express';
 import { MailService } from 'src/mailer/mail.service';
+import { UserCategoryModel } from './usercategory';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectModel('User') private readonly userModel: Model<UserModel>,
+        @InjectModel('UserCategory') private readonly userCategoryModel: Model<UserCategoryModel>,
         private sMail: MailService
         ){}
 
@@ -35,8 +37,8 @@ export class UserService {
     }
 
     async getById(id: string){
-        const select = 'email name menu submenu cpfcnpj roles birthday createdAt updatedAt';
-        return await this.userModel.findById(id).populate('menu').select(select).exec();
+        const select = 'email name menu submenu cpfcnpj roles birthday createdAt updatedAt hour_price hour_worked';
+        return await this.userModel.findOne({ _id: id }).populate('menu').select(select).exec();
     }
 
     async getByEmail(email: string){
@@ -119,6 +121,24 @@ export class UserService {
     async delete(id: string){
         try {
             return await this.userModel.deleteOne({ _id: id }).exec();
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async createCategoryUser(data: UserCategoryModel){
+        try {
+            const category = new this.userCategoryModel(data);
+            await category.save();
+            return new HttpException('Categoria criada com sucesso!', HttpStatus.CREATED);
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getAllUsers(){
+        try {
+            return await this.userModel.find({ roles: { $in: ['user'] }}).populate('category_user').select('name hour_price category_user').exec();
         } catch (error) {
             throw new HttpException('Houve um erro ao executar sua requisição', HttpStatus.INTERNAL_SERVER_ERROR);
         }

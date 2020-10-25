@@ -6,6 +6,7 @@ import { UserModel } from './shared/user';
 import { RolesGuard } from 'src/auth/shared/roles.guard';
 import { MenuModel } from 'src/menu/shared/menu';
 import { MenuModule } from 'src/menu/menu.module';
+import { UserCategoryModel } from './shared/usercategory';
 
 @Controller('user')
 export class UserController {
@@ -23,7 +24,7 @@ export class UserController {
 
     @SetMetadata('roles', ['admin'])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Get(':id')
+    @Get('id/:id')
     async getById(@Param('id') id: string) : Promise<UserModule>{
         return this.sUser.getById(id);
     }
@@ -65,6 +66,20 @@ export class UserController {
     @Get('menu/:id')
     getMenu(@Param('id') _id: string): Promise<MenuModule[]>{
         return this.sUser.getMenu(_id);
+    }
+
+    @SetMetadata('roles', ['admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('freelancer')
+    getAllUser(): Promise<MenuModule[]>{
+        return this.sUser.getAllUsers();
+    }
+
+    @SetMetadata('roles', ['admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Post('category')
+    createCategory(@Body() data: UserCategoryModel) {
+        return this.sUser.createCategoryUser(data);
     }
 
 }

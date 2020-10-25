@@ -25,7 +25,7 @@ export class MailService {
         });
     }
 
-    public briefingEmail(to, name): void {
+    public budgetEmail(to, data): void {
       this
         .mailerService
         .sendMail({
@@ -34,7 +34,12 @@ export class MailService {
           subject: 'Projeto em andamento!',
           template: 'briefing', 
           context: {  
-            name: name,
+            title: data.title,
+            price: data.price,
+            deadline: data.deadline,
+            status: data.status,
+            name: data.customer.name,
+            token: data.token
           },
         })
         .then((success) => {
@@ -44,5 +49,6 @@ export class MailService {
           console.log(err)
         });
     }
+
 
 }

@@ -1,3 +1,5 @@
+import { TokenService } from './../../token/shared/token.service';
+import { UserService } from 'src/user/shared/user.service';
 import { LanguageModel } from './language.model';
 import { ArchiveModel } from './archive.model';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -17,8 +19,10 @@ export class OrderService {
         @InjectModel('Order') private readonly orderModel: Model<OrderModel>,
         @InjectModel('OrderStatus') private readonly orderStatusModel: Model<OrderStatusModel>,
         @InjectModel('Archive') private readonly archiveModel: Model<ArchiveModel>,
-        @InjectModel('Language') private readonly languageModel: Model<LanguageModel>,
-        private readonly sMail: MailService
+        @InjectModel('LanguageProgram') private readonly languageModel: Model<LanguageModel>,
+        private sUser: UserService,
+        private readonly sMail: MailService,
+        private sToken: TokenService
     ) {}
 
     async create(data: OrderModel) {
@@ -83,7 +87,7 @@ export class OrderService {
 
     async getOrderById(_id: string){
         let removePopulate= '-password -menu -submenu -birthday -roles -updatedAt -createdAt';
-        let populate = 'category archive language status customer user';
+        let populate = 'category archive language_program status customer user';
         try {
            return await this.orderModel.findOne({ _id }).populate(populate, removePopulate).exec();
         } catch (error) {
@@ -97,7 +101,6 @@ export class OrderService {
             await archive.save();
             return new HttpException('Archive criado com sucesso!', HttpStatus.CREATED);
         } catch (error) {
-            console.log(error)
             throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
@@ -129,6 +132,87 @@ export class OrderService {
         } catch (error) {
             throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    async update(_id: string, data: OrderModel) {
+        try {
+            await this.orderModel.updateOne({ _id }, data).exec();
+            return new HttpException('Order atualizado com sucesso!', HttpStatus.OK);
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async updateStatus(_id: string, data){
+        try {
+            await this.orderModel.updateOne({ _id }, { status: data }).exec();
+            return new HttpException('Order atualizado com sucesso!', HttpStatus.OK);
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getAllStatus(){
+        try {
+            return await this.orderStatusModel.find().exec();
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getPriceOrder(id, query){
+        try {
+            if(Object.keys(query).length > 0){
+                const order = await this.orderModel.findOne({ id }).exec();
+                const user = await this.sUser.getById(query.id);
+                const userHourPrice = parseFloat(user.hour_price);
+                const userHourDayWorked = parseFloat(user.hour_worked);
+                const price = (userHourPrice * userHourDayWorked) * parseInt(order.time);
+                const priceNoCommission = price - ((query.commission / 100) * price);
+                return {
+                    price: price,
+                    price_nocommission: priceNoCommission,
+                    price_gain: price - priceNoCommission
+                }
+            } else {
+                throw new HttpException('Insira as query necessárias (commission, user id).', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (error) {
+            console.log(error);
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    async setBudget(id, data){
+        try {
+            const status = await this.orderStatusModel.findOne({ idstatus: 2 }).exec();
+            await this.orderModel.updateOne({ id }, { 
+                user: data.user, 
+                price: data.price, 
+                price_nocommission: data.price_nocommission, 
+                price_gain: data.price_gain,
+                $push: { status: status._id } 
+            });
+            const order = await this.orderModel.findOne({ id }).populate('user customer category').exec();
+            const token = await this.sToken.create({
+                type: 'checkout',
+                id: id
+            });
+            order['token'] = token.token;
+            await this.sMail.budgetEmail(order.customer.email, order);
+            return new HttpException('Budget feito com sucesso!', HttpStatus.OK);
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getCheckout(token){
+        const getToken = await this.sToken.getToken(token);
+        if(!getToken){
+            throw new HttpException('Token inválido ou expirado.', HttpStatus.BAD_REQUEST);
+        }
+        return await this.orderModel.findOne({ id: getToken.id }).exec();
     }
 
 }

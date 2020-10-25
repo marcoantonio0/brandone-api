@@ -52,7 +52,11 @@ export const UserSchema = new mongoose.Schema({
         type: String
     }],
     hour_price: {
-        type: Number,
+        type: String,
+        default: 0
+    },
+    hour_worked: {
+        type: String,
         default: 0
     },
     category_user: {

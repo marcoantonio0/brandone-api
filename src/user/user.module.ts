@@ -1,3 +1,4 @@
+import { UserCategorySchema } from './schema/usercategory.schema';
 import { UserSchema } from './schema/user.schema';
 import { UserService } from './shared/user.service';
 import { UserController } from './user.controller';
@@ -7,7 +8,7 @@ import { MailModule } from 'src/mailer/mail.module';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{name: 'User', schema: UserSchema}]),
+        MongooseModule.forFeature([{name: 'User', schema: UserSchema}, {name: 'UserCategory', schema: UserCategorySchema}]),
         MailModule
     ],
     controllers: [

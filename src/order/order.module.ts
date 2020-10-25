@@ -1,3 +1,4 @@
+import { TokenModule } from './../token/token.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './shared/order.service';
 import { Module } from '@nestjs/common';
@@ -9,7 +10,7 @@ import { MailModule } from 'src/mailer/mail.module';
 import { Connection } from 'mongoose';
 import * as AutoIncrementFactory from 'mongoose-sequence';
 import { ArchiveSchema } from './schema/archive.schema';
-import { LanguageSchema } from './schema/language.schema';
+import { LanguageProgramSchema } from './schema/language.schema';
 
 @Module({
   imports: [
@@ -26,10 +27,11 @@ import { LanguageSchema } from './schema/language.schema';
       },
     ]),
     MongooseModule.forFeature(
-      [{ name: 'OrderStatus', schema: OrderStatusSchema }, { name: 'Language', schema: LanguageSchema }, { name: 'Archive', schema: LanguageSchema }],
+      [{ name: 'OrderStatus', schema: OrderStatusSchema }, { name: 'LanguageProgram', schema: LanguageProgramSchema }, { name: 'Archive', schema: ArchiveSchema }],
       ),
     UserModule,
-    MailModule
+    MailModule,
+    TokenModule
   ],
   controllers: [OrderController],
   providers: [OrderService],

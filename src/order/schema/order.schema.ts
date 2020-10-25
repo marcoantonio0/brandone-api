@@ -10,6 +10,10 @@ export const OrderSchema = new mongoose.Schema({
         ref: 'User',
         required: true, 
     },
+    commission: {
+        type: Number,
+        default: 0
+    },
    title: {
        type: String,
        maxlength: 128,
@@ -29,6 +33,11 @@ export const OrderSchema = new mongoose.Schema({
        type: Date,
        required: true
    },
+   time: {
+       type: String,
+       required: true,
+       default: 0
+   },
    images: [{
        type: String
    }],
@@ -38,6 +47,14 @@ export const OrderSchema = new mongoose.Schema({
     required: true  
     }],
     price: {
+        type: Number,
+        default: 0
+    },
+    price_nocommission: {
+        type: Number,
+        default: 0
+    },
+    price_gain: {
         type: Number,
         default: 0
     },
@@ -63,9 +80,9 @@ export const OrderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Archive' 
     }],
-    language: [{
+    language_program: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Language'
+        ref: 'LanguageProgram'
     }]
 }, { timestamps: true })
 

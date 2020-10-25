@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 
 export interface OrderStatusModel extends Document {
     _id: string;
-    statusid: Number;
+    idstatus: Number;
     status: string;
     description: string;
     user: string;

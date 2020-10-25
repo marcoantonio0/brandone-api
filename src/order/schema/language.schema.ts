@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const LanguageSchema = new mongoose.Schema({
+export const LanguageProgramSchema = new mongoose.Schema({
    type: {
        type: String,
        required: true
