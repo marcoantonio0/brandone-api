@@ -9,6 +9,7 @@ import { MailModule } from 'src/mailer/mail.module';
 import { Connection } from 'mongoose';
 import * as AutoIncrementFactory from 'mongoose-sequence';
 import { ArchiveSchema } from './schema/archive.schema';
+import { LanguageSchema } from './schema/language.schema';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { ArchiveSchema } from './schema/archive.schema';
       },
     ]),
     MongooseModule.forFeature(
-      [{ name: 'OrderStatus', schema: OrderStatusSchema }, { name: 'Archive', schema: ArchiveSchema }],
+      [{ name: 'OrderStatus', schema: OrderStatusSchema }, { name: 'Language', schema: LanguageSchema }, { name: 'Archive', schema: LanguageSchema }],
       ),
     UserModule,
     MailModule

@@ -19,16 +19,16 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
         MailModule, 
     MailerModule.forRoot({
       transport: {
-        host: 'smtp-relay.sendinblue.com',
-        port: 587,
+        host: process.env.MAILHOST,
+        port: process.env.MAILPORT,
         secure: false, // upgrade later with STARTTLS
         auth: {
-          user: "marcoantoniosouza63@gmail.com",
-          pass: "FJUXNW07SQwy5sfD",
+          user: process.env.MAILUSER,
+          pass: process.env.MAILPASS,
         },
       },
       defaults: {
-        from:'"nest-modules" <marcoantoniosouza63@gmail.com>',
+        from:'"nest-modules" <'+process.env.MAILUSER+'>',
       },
       template: {
         dir: process.cwd() + '/templates',

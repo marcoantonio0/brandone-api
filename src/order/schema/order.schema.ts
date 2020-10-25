@@ -38,7 +38,8 @@ export const OrderSchema = new mongoose.Schema({
     required: true  
     }],
     price: {
-        type: Number
+        type: Number,
+        default: 0
     },
     itens: [{
         type: String,
@@ -58,10 +59,13 @@ export const OrderSchema = new mongoose.Schema({
             default: Date.now()
         }
     }],
-    archives: [{
+    archive: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Archives',
-        required: true  
+        ref: 'Archive' 
+    }],
+    language: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Language'
     }]
 }, { timestamps: true })
 

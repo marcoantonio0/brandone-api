@@ -1,8 +1,8 @@
 import { Document } from 'mongoose';
 
 export interface OrderModel extends Document {
-    user: string; 
-    customer: string;
+    user: any; 
+    customer: any;
    title: string;
    description: string;
    createAt: Date;

@@ -1,6 +1,8 @@
+import { LanguageModel } from './language.model';
+import { ArchiveModel } from './archive.model';
 import { MailerService } from '@nestjs-modules/mailer';
-import { OrderStatusModel } from './orderstatys';
-import { OrderModel } from './order';
+import { OrderStatusModel } from './orderstatus.model';
+import { OrderModel } from './order.model';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,6 +16,8 @@ export class OrderService {
     constructor(
         @InjectModel('Order') private readonly orderModel: Model<OrderModel>,
         @InjectModel('OrderStatus') private readonly orderStatusModel: Model<OrderStatusModel>,
+        @InjectModel('Archive') private readonly archiveModel: Model<ArchiveModel>,
+        @InjectModel('Language') private readonly languageModel: Model<LanguageModel>,
         private readonly sMail: MailService
     ) {}
 
@@ -25,6 +29,18 @@ export class OrderService {
             await order.save();
             return new HttpException('Briefing criado com sucesso!', HttpStatus.CREATED);
         } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    
+    async getAll() {
+        let removePopulate= '-password -cpfcnpj -menu -submenu -email -birthday -roles -phone -updatedAt -createdAt -razao_social';
+        let populate = 'category status user customer';
+        try {   
+           return await this.orderModel.find().populate(populate, removePopulate).exec();
+        } catch (error) {
+            console.log(error);
             throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -66,9 +82,50 @@ export class OrderService {
     }
 
     async getOrderById(_id: string){
-        let populate = 'category status';
+        let removePopulate= '-password -menu -submenu -birthday -roles -updatedAt -createdAt';
+        let populate = 'category archive language status customer user';
         try {
-           return await this.orderModel.findOne({ _id }).populate(populate).exec();
+           return await this.orderModel.findOne({ _id }).populate(populate, removePopulate).exec();
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async createArchive(data: ArchiveModel) {
+        try {
+            const archive = await new this.archiveModel(data);
+            await archive.save();
+            return new HttpException('Archive criado com sucesso!', HttpStatus.CREATED);
+        } catch (error) {
+            console.log(error)
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    async createLanguage(data: LanguageModel) {
+        try {
+            const language = await new this.languageModel(data);
+            await language.save();
+            return new HttpException('Language criado com sucesso!', HttpStatus.CREATED);
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    async getAllArchive() {
+        try {
+            return await this.archiveModel.find().exec();
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    async getAllLanguage() {
+        try {
+            return await this.languageModel.find().exec();
         } catch (error) {
             throw new HttpException('Houve um erro ao executar sua requisição. Verifique os dados enviados e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
         }

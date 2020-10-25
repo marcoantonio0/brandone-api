@@ -20,7 +20,7 @@ import { RolesGuard } from './shared/roles.guard';
         }),
         JwtModule.register({
           secret: process.env.JWTSECRETKEY,
-          signOptions: { expiresIn: '1500s' },
+          signOptions: { expiresIn: '14400s' },
         }),
     ],
     controllers: [AuthController],

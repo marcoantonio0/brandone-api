@@ -48,7 +48,8 @@ export class UserService {
     }
 
     async getMenu(_id: string){
-        const user = await  this.userModel.findOne({ _id }).populate('menu').exec();
+        try {
+            const user = await  this.userModel.findOne({ _id }).populate('menu').exec();
         let subExits = [];
         for (const [index, menu] of user.menu.entries()) {
             // Verifica se o menu está inativo e o remove
@@ -76,6 +77,10 @@ export class UserService {
             }
         }
         return user.menu; // Retorna o menu
+        
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição, verifique os campos e tente novamente.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     async create(user) {

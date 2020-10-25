@@ -50,7 +50,15 @@ export const UserSchema = new mongoose.Schema({
     }],
     submenu: [{
         type: String
-    }]
+    }],
+    hour_price: {
+        type: Number,
+        default: 0
+    },
+    category_user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'UserCategory'
+    }
 }, { timestamps: true });
 
 UserSchema.index({ name: "text", cpfcnpj: "text", email: "text", roles: "text" });
