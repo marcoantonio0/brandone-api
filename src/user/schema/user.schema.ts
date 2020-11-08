@@ -26,6 +26,9 @@ export const UserSchema = new mongoose.Schema({
         maxlength: 128,
         required: true
     },
+    picture: {
+        type: String
+    },
     birthday: {
         type: Date,
         required: true

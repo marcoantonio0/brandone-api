@@ -10,7 +10,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as SibApiV3Sdk from 'sib-api-v3-sdk'; // add this 1 of 4
 import { MailService } from 'src/mailer/mail.service';
-
+import * as moment from 'moment';
 
 
 @Injectable()
@@ -20,6 +20,7 @@ export class OrderService {
         @InjectModel('OrderStatus') private readonly orderStatusModel: Model<OrderStatusModel>,
         @InjectModel('Archive') private readonly archiveModel: Model<ArchiveModel>,
         @InjectModel('LanguageProgram') private readonly languageModel: Model<LanguageModel>,
+        @InjectModel('Bid') private readonly bidModel: Model<any>,
         private sUser: UserService,
         private readonly sMail: MailService,
         private sToken: TokenService
@@ -214,5 +215,52 @@ export class OrderService {
         }
         return await this.orderModel.findOne({ id: getToken.id }).exec();
     }
+
+    async getAllOrdersBidsActive() {
+      try {
+        let date = new Date();
+        date.setDate(date.getDate());
+        let select = 'deadline description title bids auction_deadline category';
+        return await this.orderModel.find({ auction_status: 1, auction_deadline: { $gte: date }}).populate('category').select(select).exec();
+      } catch (error) {
+        throw new HttpException('Houve um erro ao executar sua requisição.', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+    async getOrderAuctionById(_id: string){
+        try {
+            let select = 'title category archive image description bids';
+            let populate = 'archive category bids.user bids.user.category_user';
+            let populateRemove = '-category_user -password -menu -phone -roles -submenu -email -cpfcnpj -email -birthday -createdAt -hour_price -hour_worked -razao_social -updatedAt';
+            return await this.orderModel.findOne({ _id }).populate(populate, populateRemove).select(select,).exec();
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async addBidToAuction(_id: string, body: any){
+        try {
+            const total = await this.bidModel.find({orderid: _id, user: body.user}).exec();
+            if(total.length == 0){
+                const bid = await new this.bidModel(body);
+                await bid.save();
+                return new HttpException('Bid feito com sucesso!', HttpStatus.CREATED);
+            } else {
+                throw new HttpException('Você já aplicou para este projeto.', HttpStatus.NOT_IMPLEMENTED);
+            }
+        } catch (error) {
+            if(error.response) throw new HttpException(error.response, error.status);
+            throw new HttpException('Houve um erro ao executar sua requisição.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    async getBidsByOrderId(_id: string){
+        try {
+            return await this.bidModel.find({ orderid: _id }).populate({ path:'user user.category_user', select: 'name picture' }).exec();
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
 
 }

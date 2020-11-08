@@ -1,3 +1,4 @@
+import { AppGateway } from './app.gateway';
 import { TokenModule } from './token/token.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailModule } from './mailer/mail.module';
@@ -50,10 +51,10 @@ import { AuthModule } from './auth/auth.module';
     }),
     CategoryModule,
     UserModule,
-    AuthModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [
-    MailService, AppService],
+    MailService, AppService, AppGateway],
 })
 export class AppModule { }

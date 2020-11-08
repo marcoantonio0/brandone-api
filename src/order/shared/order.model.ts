@@ -14,4 +14,8 @@ export interface OrderModel extends Document {
    _id: string;
    time: string;
    id: number;
+   auction_status: 0 | 1;
+   bids?: any[];
+   total: number;
+   action_deadline: Date;
 }

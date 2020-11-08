@@ -65,7 +65,7 @@ export class OrderController {
 
     @SetMetadata('roles', ['customer','admin'])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Get(':id')
+    @Get('id/:id')
     async getOrderById(@Param('id') _id: string) {
         return this.sOrder.getOrderById(_id);
     }
@@ -118,5 +118,33 @@ export class OrderController {
     async getCheckout(@Param('token') token: string) {
         return this.sOrder.getCheckout(token);
     }
+
     
+    @SetMetadata('roles', ['user', 'admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('auction')
+    async getOrdersBidsActive() {
+        return this.sOrder.getAllOrdersBidsActive();
+    }
+
+    @SetMetadata('roles', ['user', 'admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('auction/:id')
+    async getActionById(@Param('id') _id: string) {
+        return this.sOrder.getOrderAuctionById(_id);
+    }
+    
+    @SetMetadata('roles', ['user', 'admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('bids/:id')
+    async getBidsByOrderId(@Param('id') _id: string) {
+        return this.sOrder.getBidsByOrderId(_id);
+    }
+
+    @SetMetadata('roles', ['user', 'admin'])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Post('bids/:id')
+    async addBidToAuction(@Param('id') _id: string, @Body() body) {
+        return this.sOrder.addBidToAuction(_id, body);
+    }
 }

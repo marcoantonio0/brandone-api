@@ -11,6 +11,7 @@ import { Connection } from 'mongoose';
 import * as AutoIncrementFactory from 'mongoose-sequence';
 import { ArchiveSchema } from './schema/archive.schema';
 import { LanguageProgramSchema } from './schema/language.schema';
+import { BidSchema } from './schema/bid.schema';
 
 @Module({
   imports: [
@@ -26,9 +27,12 @@ import { LanguageProgramSchema } from './schema/language.schema';
         inject: [getConnectionToken(process.env.CONNECTIONSTRING)],
       },
     ]),
-    MongooseModule.forFeature(
-      [{ name: 'OrderStatus', schema: OrderStatusSchema }, { name: 'LanguageProgram', schema: LanguageProgramSchema }, { name: 'Archive', schema: ArchiveSchema }],
-      ),
+    MongooseModule.forFeature([
+      { name: 'OrderStatus', schema: OrderStatusSchema }, 
+      { name: 'LanguageProgram', schema: LanguageProgramSchema }, 
+      { name: 'Archive', schema: ArchiveSchema },
+      { name: 'Bid', schema: BidSchema }
+    ]),
     UserModule,
     MailModule,
     TokenModule
