@@ -65,6 +65,10 @@ export const UserSchema = new mongoose.Schema({
     category_user: {
         type: mongoose.Types.ObjectId,
         ref: 'UserCategory'
+    },
+    online: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

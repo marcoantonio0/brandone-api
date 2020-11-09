@@ -1,16 +1,20 @@
 import { UserService } from 'src/user/shared/user.service';
 import { Logger, SetMetadata, UseGuards } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from './auth/shared/jwt-auth.guard';
 import { RolesGuard } from './auth/shared/roles.guard';
+import { NotificationService } from './notification/shared/notification.service';
+import { NotificationModel } from './notification/shared/notification.model';
 
 
 @WebSocketGateway()
 
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+    users: any[] = [];
     constructor(
-        private sUser: UserService
+        private sNotification: NotificationService,
+        private sUser: UserService,
     ) {
 
     }
@@ -25,6 +29,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
     handleDisconnect(client: Socket){
         this.logger.log(`Client disconnected: ${client.id}`);
+        const index = this.users.findIndex(x => x.usersession === client.id);
+        if(index >= 0){
+            this.sUser.setOffline(this.users[index].userid);
+            this.users.splice(index, 1);
+        }
     }
 
     handleConnection(client: Socket){
@@ -33,6 +42,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
     @SubscribeMessage('join')
     async handleMessage(client: Socket, data: any) {
+        this.users.push({
+            userid: data,
+            usersession: client.id
+        });
+        await this.sUser.setOnline(data);
         // Entra na room da própria id
         client.join([data, 'global']);
         const user = await this.sUser.getById(data);
@@ -44,8 +58,17 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
         }
     }
 
+    @SubscribeMessage('leave')
+    async leave(client: Socket, data: any) {
+        
+        const setonlien = await this.sUser.setOffline(data);
+        console.log(setonlien);
+        
+    }
+
     @SubscribeMessage('global')
-    async globalMessage(client: Socket, data: any) {
+    async globalMessage(client: Socket, data: NotificationModel) {
+        this.sNotification.create(data);
         this.wss.in('global').emit('global notification', data);
     }
 

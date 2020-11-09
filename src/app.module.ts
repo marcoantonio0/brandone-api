@@ -1,3 +1,4 @@
+import { NotificationModule } from './notification/notification.module';
 import { AppGateway } from './app.gateway';
 import { TokenModule } from './token/token.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -16,7 +17,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
+  imports: [ 
     TokenModule,
     MailModule,
     MailerModule.forRoot({
@@ -51,7 +52,8 @@ import { AuthModule } from './auth/auth.module';
     }),
     CategoryModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [

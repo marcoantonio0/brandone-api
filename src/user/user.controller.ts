@@ -39,6 +39,21 @@ export class UserController {
         return this.sUser.getByEmail(email);
     }
 
+    @Post('password')
+    async recoverPassword(@Body() data: any) : Promise<any>{
+        return this.sUser.setTokenPassword(data.username);
+    }
+
+    @Get('password/:token')
+    async getTokenPassword(@Param('token') token: string) : Promise<any>{
+        return this.sUser.getTokenPassword(token);
+    }
+
+    @Post('password/change')
+    async changePassword(@Body() data: any) : Promise<any>{
+        return this.sUser.changePassword(data);
+    }
+
     @Post()
     async create(@Body() user: UserModel) : Promise<any>{
         return this.sUser.create(user);

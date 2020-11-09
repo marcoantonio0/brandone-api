@@ -1,3 +1,4 @@
+import { TokenService } from './../../token/shared/token.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -12,6 +13,7 @@ export class UserService {
     constructor(
         @InjectModel('User') private readonly userModel: Model<UserModel>,
         @InjectModel('UserCategory') private readonly userCategoryModel: Model<UserCategoryModel>,
+        private sToken: TokenService,
         private sMail: MailService
         ){}
 
@@ -118,6 +120,59 @@ export class UserService {
         }
     }
 
+    async setTokenPassword(username){
+        let user;
+        if(isNaN(username)){
+            user = await this.getByEmail(username);
+        } else {
+            user = await this.getByCpfCnpj(Number.parseInt(username));
+        }
+        if(!user){
+            throw new HttpException('E-mail ou CPF/CNPJ inválido.', HttpStatus.NOT_FOUND);
+        }
+        const tokens = await this.sToken.getAllTokenById(user._id);
+        if(tokens.length != 0 && tokens.length >= 1) {
+            throw new HttpException('Você já tem uma solicitação de alteração de senha ativa. Verifique seu e-mail ou tente novamente mais tarde.', HttpStatus.BAD_REQUEST);
+        }
+        const token = await this.sToken.create({
+            type: 'passwordReset',
+            id: user._id
+        });
+        return new HttpException(`Solicitação feita com sucesso! Enviamos um e-mail para "${this.protect_email(user.email)}" com instruções para criar uma nova senha.`, HttpStatus.CREATED);
+    }
+
+    async changePassword(data){
+        const getToken = await this.sToken.getToken(data.token);
+        if(!getToken){
+            throw new HttpException('Token inválido ou expirado.', HttpStatus.BAD_REQUEST);
+        }
+        const hashPassword = await bcrypt.hash(data.password, 10);
+        try {
+            await this.userModel.updateOne({ _id: getToken.id }, { password: hashPassword }).exec();
+            await this.sToken.expireToken(getToken._id);
+            return new HttpException('Senha atualizada com sucesso!', HttpStatus.OK);
+        } catch (error) {
+            throw new HttpException('Houve um erro ao executar sua requisição', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async getTokenPassword(token){
+        const getToken = await this.sToken.getToken(token);
+        if(!getToken){
+            throw new HttpException('Token inválido ou expirado.', HttpStatus.BAD_REQUEST);
+        }
+        return new HttpException('Token válido.', HttpStatus.OK)
+    }
+
+    async setOffline(_id: string){
+        await this.userModel.updateOne({ _id }, { online: false }).exec();
+    }
+
+    async setOnline(_id: string){
+        await this.userModel.updateOne({ _id }, { online: true }).exec();
+        return await this.userModel.findOne({_id}).exec();
+    }
+
     async delete(id: string){
         try {
             return await this.userModel.deleteOne({ _id: id }).exec();
@@ -142,6 +197,16 @@ export class UserService {
         } catch (error) {
             throw new HttpException('Houve um erro ao executar sua requisição', HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    protect_email(user_email: string) {
+        var avg, splitted, part1, part2;
+        splitted = user_email.split("@");
+        part1 = splitted[0];
+        avg = part1.length / 2;
+        part1 = part1.substring(0, (part1.length - avg));
+        part2 = splitted[1];
+        return part1 + "...@" + part2;
     }
 
 }

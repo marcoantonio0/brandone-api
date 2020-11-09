@@ -39,4 +39,13 @@ export class TokenService {
         return gettoken;
     }
 
+    async getAllTokenById(_id: string) {
+        const gettoken = await this.tokenModel.find({ id: _id, expired: false }).exec();
+        return gettoken;
+    }
+
+    async expireToken(_id: string) {
+       await this.tokenModel.findOneAndUpdate({ _id }, { expired: true }).exec(); 
+    }
+
 }
